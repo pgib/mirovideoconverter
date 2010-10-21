@@ -30,11 +30,11 @@
 @implementation VideoConversionCommands
 @synthesize screenSize;
 
-char *deviceNames[] = { "Android Devices", " Nexus One", " Dream / G1", " Magic / myTouch", " Droid", " Eris / Desire", " Hero", " Cliq / DEXT", " Behold II", nil, "Apple Devices", " iPhone", " iPod Touch", " iPod Nano", " iPod Classic", " iPad", nil, "Other Devices and Formats", " Playstation Portable (PSP)", " Theora", " WebM (vp8)", " MP4", " MP3 (Audio only)", nil, nil };
-char *selectors[] = { "Android Devices", "nexus", "dream", "magic", "droid", "eris", "hero", "cliq", "behold", nil, "Apple Devices", "ipod", "ipod", "ipod", "ipod", "ipod", nil, "Other Devices", "playstation", "theora", "vp8", "mp4", "mp3", nil, nil };
-char *fileExtensions[] = { "Android Devices", "nexus.mp4", "dream.mp4", "magic.mp4", "droid.mp4", "eris.mp4", "hero.mp4", "cliq.mp4", "behold.mp4", nil, "Apple Devices", "iphone.mp4", "ipod.mp4", "ipod.mp4", "ipod.mp4", "ipad.mp4", nil, "Other Devices", "psp.mp4", "theora.ogv", "webm", "mp4", "mp3", nil, nil };
-char *converterExecutables[] = { "Android Devices", "ffmpeg", "ffmpeg", "ffmpeg", "ffmpeg", "ffmpeg", "ffmpeg", "ffmpeg", "ffmpeg", nil, "Apple Devices", "ffmpeg", "ffmpeg", "ffmpeg", "ffmpeg", "ffmpeg", nil, "Other Devices", "ffmpeg", "ffmpeg2theora", "ffmpeg", "ffmpeg", "ffmpeg", nil, nil };
-CGSize screenSizes[] = { { 0,0 }, { 800,480 }, { 480,320 }, { 480,320 }, { 854,480 }, { 480,320 }, { 480,320 }, { 480,320 }, { 480,320 }, { 0,0 }, { 0,0 }, { 480,320 },  { 480,320 }, { 480,320 }, { 480,320 }, { 1024, 768 }, { 0,0 }, { 0,0 }, { 480,320 },  { 1024,768 }, { 1024,768 }, { 1024,768 }, { 1024,768 }, { 0,0 }, { 0,0 } };
+char *deviceNames[] = { "Android Devices", " Nexus One", " Dream / G1", " Magic / myTouch", " Droid", " Eris / Desire", " Hero", " Cliq / DEXT", " Behold II", nil, "Apple Devices", " iPhone", " iPod Touch", " iPod Nano", " iPod Classic", " iPad", " Apple TV SD", " Apple TV HD", nil, "Other Devices and Formats", " Playstation Portable (PSP)", " Theora", " WebM (vp8)", " MP4", " MP3 (Audio only)", nil, nil };
+char *selectors[] = { "Android Devices", "nexus", "dream", "magic", "droid", "eris", "hero", "cliq", "behold", nil, "Apple Devices", "ipod", "ipod", "ipod", "ipod", "ipod", "appleTvSd", "appleTvHd", nil, "Other Devices", "playstation", "theora", "vp8", "mp4", "mp3", nil, nil };
+char *fileExtensions[] = { "Android Devices", "nexus.mp4", "dream.mp4", "magic.mp4", "droid.mp4", "eris.mp4", "hero.mp4", "cliq.mp4", "behold.mp4", nil, "Apple Devices", "iphone.mp4", "ipod.mp4", "ipod.mp4", "ipod.mp4", "ipad.mp4", "appletv-sd.mp4", "appletv-hd.mp4", nil, "Other Devices", "psp.mp4", "theora.ogv", "webm", "mp4", "mp3", nil, nil };
+char *converterExecutables[] = { "Android Devices", "ffmpeg", "ffmpeg", "ffmpeg", "ffmpeg", "ffmpeg", "ffmpeg", "ffmpeg", "ffmpeg", nil, "Apple Devices", "ffmpeg", "ffmpeg", "ffmpeg", "ffmpeg", "ffmpeg", "ffmpeg", "ffmpeg", nil, "Other Devices", "ffmpeg", "ffmpeg2theora", "ffmpeg", "ffmpeg", "ffmpeg", nil, nil };
+CGSize screenSizes[] = { { 0,0 }, { 800,480 }, { 480,320 }, { 480,320 }, { 854,480 }, { 480,320 }, { 480,320 }, { 480,320 }, { 480,320 }, { 0,0 }, { 0,0 }, { 480,320 },  { 480,320 }, { 480,320 }, { 480,320 }, { 1024, 768 }, { 720, 480 }, { 1280, 720 }, { 0,0 }, { 0,0 }, { 480,320 },  { 1024,768 }, { 1024,768 }, { 1024,768 }, { 1024,768 }, { 0,0 }, { 0,0 } };
 
 -(int) deviceIndex:(NSString *)device {
   int i; BOOL lastNull;
@@ -170,6 +170,7 @@ CGSize screenSizes[] = { { 0,0 }, { 800,480 }, { 480,320 }, { 480,320 }, { 854,4
   else {
     SEL selector = NSSelectorFromString([NSString stringWithFormat:
                                          @"%sArgsForFile:andDevice:",selectors[index]]);
+	  NSLog(@"selector: %s", selectors[index]);
     NSArray* (*fn)(id, SEL, NSString*, NSString*);
     fn = (NSArray* (*)(id, SEL, NSString*, NSString*))[self methodForSelector:selector];
     NSArray *args = fn(self, selector, file, device);
@@ -258,6 +259,58 @@ CGSize screenSizes[] = { { 0,0 }, { 800,480 }, { 480,320 }, { 480,320 }, { 854,4
   [args addObject:[self outputVideoSizeStringForDevice:device]];
   [args addObject:[self fFMPEGOutputFileForFile:file andDevice:device]];
   return [NSArray arrayWithArray:args];
+}
+
+-(NSArray *) appleTvSdArgsForFile:(NSString *)file andDevice:(NSString *)device {
+	NSMutableArray *args = [NSMutableArray arrayWithCapacity:0];
+	[args addObject:@"-i"];
+	[args addObject:file];
+	[args addObject:@"-vcodec"];
+	[args addObject:@"mpeg4"];
+	[args addObject:@"-b"];
+	[args addObject:@"1800kb"];
+	[args addObject:@"-mbd"];
+	[args addObject:@"2"];
+	[args addObject:@"-cmp"];
+	[args addObject:@"2"];
+	[args addObject:@"-subcmp"];
+	[args addObject:@"2"];
+	[args addObject:@"-r"];
+	[args addObject:@"20"];
+	[args addObject:@"-acodec"];
+	[args addObject:@"aac"];
+	[args addObject:@"-ab"];
+	[args addObject:@"160000"];
+	[args addObject:@"-s"];
+	[args addObject:[self outputVideoSizeStringForDevice:device]];
+	[args addObject:[self fFMPEGOutputFileForFile:file andDevice:device]];
+	return [NSArray arrayWithArray:args];
+}
+
+-(NSArray *) appleTvHdArgsForFile:(NSString *)file andDevice:(NSString *)device {
+	NSMutableArray *args = [NSMutableArray arrayWithCapacity:0];
+	[args addObject:@"-i"];
+	[args addObject:file];
+	[args addObject:@"-vcodec"];
+	[args addObject:@"mpeg4"];
+	[args addObject:@"-b"];
+	[args addObject:@"4000kb"];
+	[args addObject:@"-mbd"];
+	[args addObject:@"2"];
+	[args addObject:@"-cmp"];
+	[args addObject:@"2"];
+	[args addObject:@"-subcmp"];
+	[args addObject:@"2"];
+	[args addObject:@"-r"];
+	[args addObject:@"20"];
+	[args addObject:@"-acodec"];
+	[args addObject:@"aac"];
+	[args addObject:@"-ab"];
+	[args addObject:@"160000"];
+	[args addObject:@"-s"];
+	[args addObject:[self outputVideoSizeStringForDevice:device]];
+	[args addObject:[self fFMPEGOutputFileForFile:file andDevice:device]];
+	return [NSArray arrayWithArray:args];
 }
 
 -(NSArray *) ipodArgsForFile:(NSString *)file andDevice:(NSString *)device {

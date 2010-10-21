@@ -55,6 +55,8 @@ extern CGSize screenSizes[];
 -(NSArray *) beholdArgsForFile:(NSString *)file andDevice:(NSString *)device;
 -(NSArray *) iPhoneArgsForFile:(NSString *)file andDevice:(NSString *)device;
 -(NSArray *) ipodArgsForFile:(NSString *)file andDevice:(NSString *)device;
+-(NSArray *) appleTvSdArgsForFile:(NSString *)file andDevice:(NSString *)device;
+-(NSArray *) appleTvHdArgsForFile:(NSString *)file andDevice:(NSString *)device;
 -(NSArray *) playstationArgsForFile:(NSString *)file andDevice:(NSString *)device;
 -(NSArray *) theoraArgsForFile:(NSString *)file andDevice:(NSString *)device;
 -(NSArray *) mp4ArgsForFile:(NSString *)file andDevice:(NSString *)device;
